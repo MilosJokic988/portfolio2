@@ -148,12 +148,12 @@ export default function ThreeMenu({ onOpenPage, onClosePage, activePage }) {
           [-1.5, 1.0, 1],
           [1.5, 0.8, 0.7],
         ]);
-      } else { // desktop
-        setPlanetScale(1);
-        setCardScale(1);
-        setFontScale(1);
-        setCardPositions(cards.map(c => c.basePos));
-      }
+    } else { // desktop
+  setPlanetScale(0.7);  // smanjeno sa 1 na 0.7
+  setCardScale(0.7);    // smanjeno sa 1 na 0.7
+  setFontScale(0.9);    // smanjeno sa 1 na 0.9
+  setCardPositions(cards.map(c => c.basePos));
+}
     };
 
     handleResize();
