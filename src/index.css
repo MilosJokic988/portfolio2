@@ -1,5 +1,5 @@
 :root {
-  --bg: #0a0a0a; /* mračna, ali stabilna pozadina */
+  --bg: #0a0a0a;
   --panel: rgba(30,30,30,0.85);
   --glass: rgba(40,40,40,0.3);
   --accent: #ff4d6d;
@@ -7,11 +7,13 @@
   font-family: "Cinzel", "Blackletter", serif;
 }
 
+/* BASE */
 html, body, #root {
   height: 100%;
   margin: 0;
   background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
   color: var(--text);
+  overflow-x: hidden;
 }
 
 .app-root {
@@ -22,16 +24,16 @@ html, body, #root {
   position: relative;
 }
 
-/* canvas container */
+/* CANVAS */
 .canvas-wrap { 
   height: 100vh; 
   width: 100vw; 
   cursor: default; 
 }
 
-/* card label */
+/* CARD LABEL */
 .card-label {
-  padding: 12px 20px;
+  padding: 10px 18px;
   border-radius: 10px;
   background: rgba(0,0,0,0.7);
   color: var(--accent);
@@ -43,12 +45,13 @@ html, body, #root {
   cursor: pointer;
   transition: transform 0.2s ease, text-shadow 0.2s ease;
 }
+
 .card-label:hover {
   transform: translateY(-10px);
   text-shadow: 0 0 10px #ff4d6d, 0 0 20px #ff4d6d;
 }
 
-/* overlay */
+/* OVERLAY */
 .overlay {
   position: absolute;
   inset: 5vh 5vw;
@@ -58,19 +61,20 @@ html, body, #root {
   pointer-events: auto;
   background: rgba(0,0,0,0.5);
 }
+
 .overlay-inner {
   width: 90%;
   height: 90%;
   background: var(--panel);
   backdrop-filter: blur(10px);
   border-radius: 16px;
-  padding: 32px;
+  padding: 28px;
   box-shadow: 0 25px 60px rgba(0,0,0,0.7);
   overflow: auto;
   border: 1px solid rgba(255,0,0,0.2);
 }
 
-/* back button */
+/* BACK BUTTON */
 .back-btn {
   background: none;
   border: 1px solid rgba(255,0,0,0.3);
@@ -81,37 +85,40 @@ html, body, #root {
   font-weight: 600;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
 .back-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 0 10px #ff4d6d;
 }
 
-/* titles and content */
+/* TITLES AND CONTENT */
 .overlay h1 {
   margin: 8px 0 16px 0;
-  font-size: 34px;
+  font-size: 28px;
   color: var(--accent);
   text-shadow: 0 0 8px #ff4d6d, 0 0 16px #ff4d6d;
 }
+
 .overlay-content p, .overlay-content li {
   color: var(--text);
   line-height: 1.6;
-  font-size: 16px;
+  font-size: 15px;
   text-shadow: 0 0 2px #ff4d6d;
 }
 
-/* pages grid */
+/* GRID */
 .works-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
   margin-top: 12px;
 }
+
 .work-card {
   background: rgba(30,30,30,0.9);
   border: 1px solid rgba(255,0,0,0.2);
   border-radius: 12px;
-  padding: 16px;
+  padding: 14px;
   text-align: center;
   color: var(--accent);
   font-weight: 600;
@@ -119,19 +126,92 @@ html, body, #root {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
 }
+
 .work-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 0 20px #ff4d6d, 0 0 30px rgba(255,77,109,0.6);
 }
 
-/* small dev hint */
+/* DEV HINT */
 .dev-hint {
   position: absolute;
   left: 12px;
   bottom: 12px;
   color: rgba(255,255,255,0.5);
-  font-size: 13px;
+  font-size: 12px;
   background: rgba(0,0,0,0.25);
-  padding: 6px 10px;
+  padding: 5px 8px;
   border-radius: 8px;
+}
+
+/* ✅ MOBILE OPTIMIZACIJA */
+@media (max-width: 768px) {
+  .overlay {
+    inset: 3vh 3vw;
+  }
+
+  .overlay-inner {
+    width: 94%;
+    height: 88%;
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .overlay h1 {
+    font-size: 22px;
+    text-align: center;
+  }
+
+  .overlay-content p, .overlay-content li {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .works-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .card-label {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .back-btn {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .dev-hint {
+    font-size: 11px;
+    left: 8px;
+    bottom: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .card-label {
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 8px;
+    transform: translateY(-4px);
+  }
+
+  .card-label:hover {
+    transform: translateY(-6px);
+  }
+
+  .works-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .work-card {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  canvas {
+    touch-action: none; /* sprečava čudno pomeranje ekrana kad se rotira 3D */
+  }
 }

@@ -4,7 +4,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(10, 10, 30, 0.95); /* tamnija, misteriozna pozadina */
+  background: rgba(10, 10, 30, 0.95);
   color: #f3f6fb;
   display: flex;
   justify-content: center;
@@ -12,15 +12,17 @@
   z-index: 1000;
   opacity: 0;
   animation: fadeIn 0.5s forwards;
-  font-family: "Uncial Antiqua", "Creepster", serif; /* gotički font */
+  font-family: "Uncial Antiqua", "Creepster", serif;
   text-shadow: 0 0 6px rgba(102, 211, 255, 0.7);
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
 .overlay-inner {
   max-width: 800px;
   width: 90%;
   padding: 2rem;
-  background: rgba(5, 5, 20, 0.8); /* tamnija pergament baza */
+  background: rgba(5, 5, 20, 0.8);
   border-radius: 15px;
   box-shadow: 0 0 40px rgba(102, 211, 255, 0.6);
   overflow-y: auto;
@@ -32,7 +34,7 @@
 .back-btn {
   background: #66d3ff;
   border: none;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.2rem;
   border-radius: 8px;
   cursor: pointer;
   margin-bottom: 1rem;
@@ -40,6 +42,7 @@
   font-weight: bold;
   transition: all 0.2s;
   text-shadow: 0 0 3px #000;
+  font-size: 1rem;
 }
 
 .back-btn:hover {
@@ -52,6 +55,7 @@
   line-height: 1.6;
   margin-bottom: 1rem;
   color: #cfdff6;
+  font-size: 1rem;
 }
 
 .overlay-content strong {
@@ -63,6 +67,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 1rem;
+  margin-top: 1rem;
 }
 
 .work-card {
@@ -87,7 +92,7 @@
   to { opacity: 1; }
 }
 
-/* scrollbar za overlay */
+/* scrollbar */
 .overlay-inner::-webkit-scrollbar {
   width: 8px;
 }
@@ -99,4 +104,62 @@
 .overlay-inner::-webkit-scrollbar-thumb {
   background: rgba(102,211,255,0.4);
   border-radius: 4px;
+}
+
+/* ✅ MOBILE OPTIMIZATION */
+@media (max-width: 768px) {
+  .overlay {
+    padding: 0.5rem;
+  }
+
+  .overlay-inner {
+    width: 95%;
+    padding: 1.2rem;
+    border-radius: 10px;
+    max-height: 88vh;
+  }
+
+  .back-btn {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .overlay-content p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .works-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.8rem;
+  }
+
+  .work-card {
+    font-size: 0.9rem;
+    padding: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .overlay-inner {
+    width: 96%;
+    padding: 1rem;
+  }
+
+  .overlay-content p {
+    font-size: 0.85rem;
+  }
+
+  .back-btn {
+    font-size: 0.85rem;
+  }
+
+  .works-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 0.6rem;
+  }
+
+  .work-card {
+    padding: 0.7rem;
+  }
 }
