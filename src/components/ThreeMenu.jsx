@@ -3,9 +3,10 @@ import { Canvas, useFrame, useThree, useLoader } from "@react-three/fiber";
 import { Text, Stars } from "@react-three/drei";
 import * as THREE from "three";
 import { TextureLoader, Vector3 } from "three";
+import { EffectComposer, Bloom, DepthOfField } from "@react-three/postprocessing";
 import ParticleTrail from "./ParticleTrail";
 
-function FloatingCard({ basePos, label, onClick, isActive, scaleFactor }) {
+function FloatingCard({ basePos, label, onClick, isActive, scaleFactor, fontScale }) {
   const mesh = useRef();
   const floatOffset = Math.random() * 2;
   const swayOffset = Math.random() * 2;
@@ -45,7 +46,7 @@ function FloatingCard({ basePos, label, onClick, isActive, scaleFactor }) {
       </mesh>
       <Text
         position={[0, 0, 0.02]}
-        fontSize={0.35 * scaleFactor}
+        fontSize={0.3 * fontScale}
         color={isActive ? "#ff6b00" : "#ff3300"}
         anchorX="center"
         anchorY="middle"
@@ -86,10 +87,10 @@ export default function ThreeMenu({ onOpenPage, onClosePage, activePage }) {
 
   const cards = useMemo(
     () => [
-      { label: "Početna", basePos: [-2.5, 1.2, 0] },
-      { label: "O meni", basePos: [1, 1.4, -1.5] },
-      { label: "Radovi", basePos: [2.5, 1.2, 1] },
-      { label: "Kontakt", basePos: [-1, 1, 1.5] },
+      { label: "Početna", basePos: [-3, 1.5, 0] },
+      { label: "O meni", basePos: [1, 1.6, -2] },
+      { label: "Radovi", basePos: [3, 1.4, 1.5] },
+      { label: "Kontakt", basePos: [-1, 1.3, 2] },
     ],
     []
   );
@@ -117,32 +118,48 @@ export default function ThreeMenu({ onOpenPage, onClosePage, activePage }) {
     return <ParticleTrail camera={camera} />;
   };
 
-  // responsive skala
+  // responsive skala i pozicije
   const [planetScale, setPlanetScale] = useState(1);
   const [cardScale, setCardScale] = useState(1);
   const [fontScale, setFontScale] = useState(1);
+  const [cardPositions, setCardPositions] = useState(cards.map(c => c.basePos));
 
   useLayoutEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
-      if (width < 480) {
-        setPlanetScale(0.4);
-        setCardScale(0.6);
-        setFontScale(1.2);
-      } else if (width < 768) {
+
+      if (width < 480) { // telefon
+        setPlanetScale(0.3);
+        setCardScale(0.5);
+        setFontScale(1.6);
+        setCardPositions([
+          [-0.9, 1.2, 0],
+          [0.9, 1.4, -0.3],
+          [-0.9, 0.8, 0.7],
+          [0.9, 0.6, 0.4],
+        ]);
+      } else if (width < 768) { // tablet
         setPlanetScale(0.6);
         setCardScale(0.75);
-        setFontScale(1.1);
-      } else {
+        setFontScale(1.2);
+        setCardPositions([
+          [-1.5, 1.2, 0],
+          [1.5, 1.4, -0.5],
+          [-1.5, 1.0, 1],
+          [1.5, 0.8, 0.7],
+        ]);
+      } else { // desktop
         setPlanetScale(1);
         setCardScale(1);
         setFontScale(1);
+        setCardPositions(cards.map(c => c.basePos));
       }
     };
+
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [cards]);
 
   // teksture planeta
   const moonTexture = useLoader(TextureLoader, "/textures/moon.jpg");
@@ -155,47 +172,55 @@ export default function ThreeMenu({ onOpenPage, onClosePage, activePage }) {
         <ambientLight intensity={0.4} />
         <directionalLight position={[5, 5, 5]} intensity={0.7} />
 
-        {/* Zvezdano nebo - manje za mobilni */}
-        <Stars radius={100} depth={60} count={1500} factor={2} fade speed={0.2} />
+        {/* Zvezdano nebo */}
+        <Stars radius={120} depth={80} count={6000} factor={3} fade speed={0.3} />
 
         <CameraController target={target} lookAt={lookAt} />
         <CameraWithTrail />
 
-        {/* Mesec - krvave boje */}
-        <mesh position={[0, -1, 0]} scale={[1.2 * planetScale, 1.2 * planetScale, 1.2 * planetScale]}>
-          <sphereGeometry args={[1.2, 64, 64]} />
+        {/* Mesec blago krvave boje */}
+        <mesh position={[0, -1.1, 0]} scale={[1.5 * planetScale, 1.5 * planetScale, 1.5 * planetScale]}>
+          <sphereGeometry args={[1.5, 64, 64]} />
           <meshStandardMaterial map={moonTexture} color="#bb4444" metalness={0.1} roughness={0.9} flatShading />
         </mesh>
 
         {/* Merkur */}
-        <mesh position={[-2.5, 0.5, -1]} scale={[0.5 * planetScale, 0.5 * planetScale, 0.5 * planetScale]}>
-          <sphereGeometry args={[0.5, 64, 64]} />
+        <mesh position={[-3, 0.5, -1]} scale={[planetScale, planetScale, planetScale]}>
+          <sphereGeometry args={[0.6, 64, 64]} />
           <meshStandardMaterial map={mercuryTexture} metalness={0.05} roughness={0.9} flatShading />
         </mesh>
 
         {/* Venera */}
-        <mesh position={[2.5, 0.3, -0.5]} scale={[0.6 * planetScale, 0.6 * planetScale, 0.6 * planetScale]}>
-          <sphereGeometry args={[0.6, 64, 64]} />
+        <mesh position={[3, 0.3, -0.5]} scale={[0.8 * planetScale, 0.8 * planetScale, 0.8 * planetScale]}>
+          <sphereGeometry args={[0.8, 64, 64]} />
           <meshStandardMaterial map={venusTexture} metalness={0.1} roughness={0.85} flatShading />
         </mesh>
 
         {/* Lebdeće kartice */}
         <group ref={sceneGroup}>
-          {cards.map((c) => (
+          {cards.map((c, i) => (
             <FloatingCard
               key={c.label}
-              basePos={c.basePos}
+              basePos={cardPositions[i]}
               label={c.label}
               onClick={handleOpen}
               isActive={activePage === c.label.toLowerCase()}
               scaleFactor={cardScale}
+              fontScale={fontScale}
             />
           ))}
+
           <mesh position={[0, -10, 0]} onClick={() => activePage && handleClose()}>
             <planeGeometry args={[200, 200]} />
             <meshBasicMaterial opacity={0} transparent />
           </mesh>
         </group>
+
+        {/* Efekti */}
+        <EffectComposer>
+          <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} intensity={1.5} />
+          <DepthOfField focusDistance={0} focalLength={0.02} bokehScale={2} height={480} />
+        </EffectComposer>
       </Canvas>
     </div>
   );
