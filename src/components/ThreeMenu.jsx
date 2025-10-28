@@ -1,9 +1,8 @@
-import React, { useRef, useMemo, useEffect, useState } from "react";
+import React, { useRef, useMemo, useEffect, useState, useLayoutEffect } from "react";
 import { Canvas, useFrame, useThree, useLoader } from "@react-three/fiber";
 import { Text, Stars } from "@react-three/drei";
 import * as THREE from "three";
 import { TextureLoader, Vector3 } from "three";
-import { EffectComposer, Bloom, DepthOfField } from "@react-three/postprocessing";
 import ParticleTrail from "./ParticleTrail";
 
 function FloatingCard({ basePos, label, onClick, isActive, scaleFactor }) {
@@ -27,16 +26,13 @@ function FloatingCard({ basePos, label, onClick, isActive, scaleFactor }) {
   return (
     <group
       ref={mesh}
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick(label.toLowerCase());
-      }}
+      onClick={(e) => { e.stopPropagation(); onClick(label.toLowerCase()); }}
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
       scale={[scaleFactor, scaleFactor, scaleFactor]}
     >
       <mesh>
-        <planeGeometry args={[2.2, 1.2]} />
+        <planeGeometry args={[1.8, 1.0]} />
         <meshStandardMaterial
           map={texture}
           metalness={0.2}
@@ -49,7 +45,7 @@ function FloatingCard({ basePos, label, onClick, isActive, scaleFactor }) {
       </mesh>
       <Text
         position={[0, 0, 0.02]}
-        fontSize={0.35 * Math.max(scaleFactor, 0.9)} // veći font
+        fontSize={0.35 * scaleFactor}
         color={isActive ? "#ff6b00" : "#ff3300"}
         anchorX="center"
         anchorY="middle"
@@ -90,10 +86,10 @@ export default function ThreeMenu({ onOpenPage, onClosePage, activePage }) {
 
   const cards = useMemo(
     () => [
-      { label: "Početna", basePos: [-3, 1.5, 0] },
-      { label: "O meni", basePos: [1, 1.6, -2] },
-      { label: "Radovi", basePos: [3, 1.4, 1.5] },
-      { label: "Kontakt", basePos: [-1, 1.3, 2] },
+      { label: "Početna", basePos: [-2.5, 1.2, 0] },
+      { label: "O meni", basePos: [1, 1.4, -1.5] },
+      { label: "Radovi", basePos: [2.5, 1.2, 1] },
+      { label: "Kontakt", basePos: [-1, 1, 1.5] },
     ],
     []
   );
@@ -114,9 +110,7 @@ export default function ThreeMenu({ onOpenPage, onClosePage, activePage }) {
     onClosePage();
   };
 
-  useEffect(() => {
-    if (!activePage) handleClose();
-  }, [activePage]);
+  useEffect(() => { if (!activePage) handleClose(); }, [activePage]);
 
   const CameraWithTrail = () => {
     const { camera } = useThree();
@@ -126,25 +120,29 @@ export default function ThreeMenu({ onOpenPage, onClosePage, activePage }) {
   // responsive skala
   const [planetScale, setPlanetScale] = useState(1);
   const [cardScale, setCardScale] = useState(1);
+  const [fontScale, setFontScale] = useState(1);
 
- useEffect(() => {
-  const handleResize = () => {
-    const w = window.innerWidth;
-    if (w < 480) { // mobilni
-      setPlanetScale(0.5);
-      setCardScale(0.65);
-    } else if (w < 768) { // tablet
-      setPlanetScale(0.7);
-      setCardScale(0.8);
-    } else { // desktop
-      setPlanetScale(0.75); // smanjeno sa 1
-      setCardScale(0.75);   // smanjeno sa 1
-    }
-  };
-  handleResize();
-  window.addEventListener("resize", handleResize);
-  return () => window.removeEventListener("resize", handleResize);
-}, []);
+  useLayoutEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width < 480) {
+        setPlanetScale(0.4);
+        setCardScale(0.6);
+        setFontScale(1.2);
+      } else if (width < 768) {
+        setPlanetScale(0.6);
+        setCardScale(0.75);
+        setFontScale(1.1);
+      } else {
+        setPlanetScale(1);
+        setCardScale(1);
+        setFontScale(1);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // teksture planeta
   const moonTexture = useLoader(TextureLoader, "/textures/moon.jpg");
@@ -152,44 +150,32 @@ export default function ThreeMenu({ onOpenPage, onClosePage, activePage }) {
   const venusTexture = useLoader(TextureLoader, "/textures/venus.jpg");
 
   return (
-    <div
-      className="canvas-wrap"
-      style={{ width: "100vw", height: "100vh", backgroundColor: "#050505" }}
-    >
+    <div className="canvas-wrap" style={{ width: "100vw", height: "100vh", backgroundColor: "#050505" }}>
       <Canvas camera={{ position: [0, 0, 8], fov: 50 }}>
         <ambientLight intensity={0.4} />
         <directionalLight position={[5, 5, 5]} intensity={0.7} />
 
-        {/* Zvezdano nebo */}
-        <Stars radius={120} depth={80} count={6000} factor={3} fade speed={0.3} />
+        {/* Zvezdano nebo - manje za mobilni */}
+        <Stars radius={100} depth={60} count={1500} factor={2} fade speed={0.2} />
 
         <CameraController target={target} lookAt={lookAt} />
         <CameraWithTrail />
 
-        {/* Mesec krvave boje */}
-        <mesh
-          position={[0, -1.1, 0]}
-          scale={[1.7 * planetScale, 1.7 * planetScale, 1.7 * planetScale]}
-        >
-          <sphereGeometry args={[1.5, 64, 64]} />
-          <meshStandardMaterial
-            map={moonTexture}
-            color="#bb4444"
-            metalness={0.1}
-            roughness={0.9}
-            flatShading
-          />
+        {/* Mesec - krvave boje */}
+        <mesh position={[0, -1, 0]} scale={[1.2 * planetScale, 1.2 * planetScale, 1.2 * planetScale]}>
+          <sphereGeometry args={[1.2, 64, 64]} />
+          <meshStandardMaterial map={moonTexture} color="#bb4444" metalness={0.1} roughness={0.9} flatShading />
         </mesh>
 
-        {/* Merkur (levo) */}
-        <mesh position={[-3, 0.5, -1]} scale={[0.6 * planetScale, 0.6 * planetScale, 0.6 * planetScale]}>
-          <sphereGeometry args={[0.6, 64, 64]} />
+        {/* Merkur */}
+        <mesh position={[-2.5, 0.5, -1]} scale={[0.5 * planetScale, 0.5 * planetScale, 0.5 * planetScale]}>
+          <sphereGeometry args={[0.5, 64, 64]} />
           <meshStandardMaterial map={mercuryTexture} metalness={0.05} roughness={0.9} flatShading />
         </mesh>
 
-        {/* Venera (desno) */}
-        <mesh position={[3, 0.3, -0.5]} scale={[0.7 * planetScale, 0.7 * planetScale, 0.7 * planetScale]}>
-          <sphereGeometry args={[0.8, 64, 64]} />
+        {/* Venera */}
+        <mesh position={[2.5, 0.3, -0.5]} scale={[0.6 * planetScale, 0.6 * planetScale, 0.6 * planetScale]}>
+          <sphereGeometry args={[0.6, 64, 64]} />
           <meshStandardMaterial map={venusTexture} metalness={0.1} roughness={0.85} flatShading />
         </mesh>
 
@@ -205,18 +191,11 @@ export default function ThreeMenu({ onOpenPage, onClosePage, activePage }) {
               scaleFactor={cardScale}
             />
           ))}
-
           <mesh position={[0, -10, 0]} onClick={() => activePage && handleClose()}>
             <planeGeometry args={[200, 200]} />
             <meshBasicMaterial opacity={0} transparent />
           </mesh>
         </group>
-
-        {/* Efekti */}
-        <EffectComposer>
-          <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} intensity={1.5} />
-          <DepthOfField focusDistance={0} focalLength={0.02} bokehScale={2} height={480} />
-        </EffectComposer>
       </Canvas>
     </div>
   );
