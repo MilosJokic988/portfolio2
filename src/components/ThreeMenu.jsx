@@ -127,24 +127,24 @@ export default function ThreeMenu({ onOpenPage, onClosePage, activePage }) {
   const [planetScale, setPlanetScale] = useState(1);
   const [cardScale, setCardScale] = useState(1);
 
-  useEffect(() => {
-    const handleResize = () => {
-      const w = window.innerWidth;
-      if (w < 480) {
-        setPlanetScale(0.5); // manje planete
-        setCardScale(0.65);  // manje kartice
-      } else if (w < 768) {
-        setPlanetScale(0.7);
-        setCardScale(0.8);
-      } else {
-        setPlanetScale(1);
-        setCardScale(1);
-      }
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+ useEffect(() => {
+  const handleResize = () => {
+    const w = window.innerWidth;
+    if (w < 480) { // mobilni
+      setPlanetScale(0.5);
+      setCardScale(0.65);
+    } else if (w < 768) { // tablet
+      setPlanetScale(0.7);
+      setCardScale(0.8);
+    } else { // desktop
+      setPlanetScale(0.75); // smanjeno sa 1
+      setCardScale(0.75);   // smanjeno sa 1
+    }
+  };
+  handleResize();
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
 
   // teksture planeta
   const moonTexture = useLoader(TextureLoader, "/textures/moon.jpg");
